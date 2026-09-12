@@ -9,7 +9,7 @@ import { PDFParse } from 'pdf-parse';
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -526,7 +526,7 @@ Provide:
 app.post('/api/ai/generate-summary', async (req, res) => {
   try {
     const { resumeData, jobDescription, tone = 'professional' } = req.body;
-    
+
     let ai: GoogleGenAI | null = null;
     try {
       ai = getGenAI();
@@ -786,14 +786,14 @@ function extractJsonFromText(rawText: string): any {
   // 1. Direct parse attempt
   try {
     return JSON.parse(text);
-  } catch {}
+  } catch { }
 
   // 2. Strip markdown code fences ```json ... ``` or ``` ... ```
   const markdownMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
   if (markdownMatch && markdownMatch[1]) {
     try {
       return JSON.parse(markdownMatch[1].trim());
-    } catch {}
+    } catch { }
   }
 
   // 3. Extract substring between first '{' and last '}'
@@ -810,7 +810,7 @@ function extractJsonFromText(rawText: string): any {
           .replace(/,\s*([}\]])/g, '$1')
           .replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
         return JSON.parse(cleaned);
-      } catch {}
+      } catch { }
     }
   }
 
